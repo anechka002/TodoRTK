@@ -2,37 +2,39 @@ import Checkbox from "@mui/material/Checkbox"
 import IconButton from "@mui/material/IconButton"
 import ListItem from "@mui/material/ListItem"
 import DeleteIcon from "@mui/icons-material/Delete"
-import { deleteTask, updateTask } from "../../../../../model/tasks-slice"
 import { ChangeEvent } from "react"
-import { useAppDispatch } from "@/common/hooks"
 import { EditableSpan } from "@/common/components"
-// import { DomainTask } from "@/features/todolists/api/tasksApi.types"
 import { TaskStatus } from "@/common/enum"
-import { RequestStatus, TasksDomainType } from "@/common/types"
+import { RequestStatus } from "@/common/types"
+import { useDeleteTaskMutation, useUpdateTaskMutation } from "@/features/todolists/api/tasksApi"
+import { createTaskModal } from "@/common/utils/createTaskModel"
+import { DomainTask } from "@/features/todolists/api/tasksApi.types"
 
 type Props = {
-  task: TasksDomainType
+  task: DomainTask
   todolistId: string
   entityStatus: RequestStatus
   disabled: boolean
 }
 
 export const TaskItem = ({ task, todolistId, entityStatus, disabled }: Props) => {
-  const dispatch = useAppDispatch()
+
+  const [deleteTask] = useDeleteTaskMutation()
+  const [updateTask] = useUpdateTaskMutation()
 
   const removeTask = () => {
-    dispatch(deleteTask({ todolistId, taskId: task.id }))
+    deleteTask({ todolistId, taskId: task.id })
   }
 
   const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const newStatus = e.currentTarget.checked ? TaskStatus.Completed : TaskStatus.New
-    const newTask = {...task, status: newStatus}
-    dispatch(updateTask(newTask))
+    const status = e.currentTarget.checked ? TaskStatus.Completed : TaskStatus.New
+    const model = createTaskModal(task, {status})
+    updateTask({todolistId, taskId: task.id, model})
   }
 
   const changeTaskTitleHandler = (title: string) => {
-    const newTask = {...task, title}
-    dispatch(updateTask(newTask))
+    const model = createTaskModal(task, {title})
+    updateTask({todolistId, taskId: task.id, model})
   }
 
   const isTaskCompleted = task.status === TaskStatus.Completed
