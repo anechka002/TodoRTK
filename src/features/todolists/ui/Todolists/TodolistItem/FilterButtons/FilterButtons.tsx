@@ -26,7 +26,7 @@ export const FilterButtons = ({ todolist }: Props) => {
   }
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between", gap: '10px' }}>
       <Button
         variant={filter === "all" ? "contained" : "outlined"}
         color={"secondary"}
