@@ -6,9 +6,10 @@ import { ChangeEvent } from "react"
 import { EditableSpan } from "@/common/components"
 import { TaskStatus } from "@/common/enum"
 import { RequestStatus } from "@/common/types"
-import { useDeleteTaskMutation, useUpdateTaskMutation } from "@/features/todolists/api/tasksApi"
+import { tasksApi, useDeleteTaskMutation, useUpdateTaskMutation } from "@/features/todolists/api/tasksApi"
 import { createTaskModal } from "@/common/utils/createTaskModel"
 import { DomainTask } from "@/features/todolists/api/tasksApi.types"
+import { useAppDispatch } from "@/common/hooks"
 
 type Props = {
   task: DomainTask
@@ -22,8 +23,24 @@ export const TaskItem = ({ task, todolistId, entityStatus, disabled }: Props) =>
   const [deleteTask] = useDeleteTaskMutation()
   const [updateTask] = useUpdateTaskMutation()
 
+  const dispatch = useAppDispatch()
+
+  const changeTaskStatus = (status: RequestStatus) => {
+    dispatch(tasksApi.util.updateQueryData('getTasks', {todolistId}, (data) => {
+      const taskToUpdate = data.items.find((el) => el.id === task.id)
+      if(taskToUpdate) {
+        taskToUpdate.entityStatus = status
+      }
+    }))
+  }
+
   const removeTask = () => {
+    changeTaskStatus('loading')
     deleteTask({ todolistId, taskId: task.id })
+      .unwrap()
+      .catch(() => {
+        changeTaskStatus('idle')
+      })
   }
 
   const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
