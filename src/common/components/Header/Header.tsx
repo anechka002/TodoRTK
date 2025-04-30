@@ -14,6 +14,7 @@ import LinearProgress from "@mui/material/LinearProgress"
 import { useLogoutMutation } from "@/features/auth/api/authApi"
 import { ResultCode } from "@/common/enum/enum"
 import { AUTH_TOKEN } from "@/common/constants.ts"
+import { baseApi } from "@/app/baseApi"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -38,6 +39,9 @@ export const Header = () => {
         dispatch(setIsLoggedIn({ isLoggedIn: false }))
       }
     })
+      .then(() => {
+        dispatch(baseApi.util.invalidateTags(['Todolist', 'Task']))
+      })
   }
 
   return (
