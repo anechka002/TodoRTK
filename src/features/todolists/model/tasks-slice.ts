@@ -15,13 +15,13 @@
 //   },
 //   reducers: create => ({
 //     // action
-//     changeTaskEntityStatus: create.reducer<{todoListId: string, taskId: string, entityStatus: RequestStatus}>((state, action) => {
-//       const tasks = state[action.payload.todoListId]
-//       const task = tasks.find((el) => el.id === action.payload.taskId)
-//       if(task) {
-//         task.entityStatus = action.payload.entityStatus;
-//       }
-//     }),
+    // changeTaskEntityStatus: create.reducer<{todoListId: string, taskId: string, entityStatus: RequestStatus}>((state, action) => {
+    //   const tasks = state[action.payload.todoListId]
+    //   const task = tasks.find((el) => el.id === action.payload.taskId)
+    //   if(task) {
+    //     task.entityStatus = action.payload.entityStatus;
+    //   }
+    // }),
 //     // async action (thunk)
 //     fetchTasks: create.asyncThunk(async(todolistId: string, thunkAPI) => {
 //       try {
