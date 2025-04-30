@@ -7,11 +7,13 @@ import Typography from "@mui/material/Typography"
 import MenuIcon from "@mui/icons-material/Menu"
 import { useAppSelector } from "@/common/hooks/useAppSelector"
 import { useAppDispatch } from "@/common/hooks/useAppDispatch"
-import { changeThemeModeAC, selectStatus, selectThemeMode } from "@/app/app-slice"
+import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedIn } from "@/app/app-slice"
 import { getTheme } from "@/common/theme/theme"
 import { NavButton } from "../NavButton/NavButton"
 import LinearProgress from "@mui/material/LinearProgress"
-import { logout, selectIsLoggedIn } from "@/features/auth/model/auth-slice"
+import { useLogoutMutation } from "@/features/auth/api/authApi"
+import { ResultCode } from "@/common/enum/enum"
+import { AUTH_TOKEN } from "@/common/constants.ts"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -22,13 +24,20 @@ export const Header = () => {
 
   const theme = getTheme(themeMode)
 
+  const [logout] = useLogoutMutation()
+
   const changeMode = () => {
     const newMode = themeMode === "light" ? "dark" : "light"
     dispatch(changeThemeModeAC({ themeMode: newMode }))
   }
 
   const logoutHandler = () => {
-    dispatch(logout())
+    logout().then((res) => {
+      if (res.data?.resultCode === ResultCode.Success) {
+        localStorage.removeItem(AUTH_TOKEN)
+        dispatch(setIsLoggedIn({ isLoggedIn: false }))
+      }
+    })
   }
 
   return (

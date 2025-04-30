@@ -1,4 +1,4 @@
-import { selectThemeMode } from "@/app/app-slice"
+import { selectThemeMode, setIsLoggedIn } from "@/app/app-slice"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { getTheme } from "@/common/theme"
 import Button from '@mui/material/Button'
@@ -12,8 +12,10 @@ import TextField from '@mui/material/TextField'
 import { useForm, SubmitHandler, Controller } from "react-hook-form"
 import s from './Login.module.css'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Inputs, loginSchema } from "../../lib/shemas"
-import { login } from "../../model/auth-slice"
+import { LoginArgs, loginSchema } from "../../lib/shemas"
+import { useLoginMutation } from "../../api/authApi"
+import { ResultCode } from "@/common/enum/enum"
+import { AUTH_TOKEN } from "@/common/constants.ts"
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -22,21 +24,25 @@ export const Login = () => {
 
   const dispatch = useAppDispatch()
 
+  const [login] = useLoginMutation()
+
   const {
     register,
     handleSubmit,
     reset,
     control,
     formState: { errors },
-  } = useForm<Inputs>({ defaultValues: {email: '', password: 'MasteR!123', rememberMe: false}, resolver: zodResolver(loginSchema) })
+  } = useForm<LoginArgs>({ defaultValues: {email: '', password: 'MasteR!123', rememberMe: false}, resolver: zodResolver(loginSchema) })
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    reset()
-    // console.log(data)
-    dispatch(login(data))
+  const onSubmit: SubmitHandler<LoginArgs> = (data) => {
+    login(data).then((res) => {
+      if (res.data?.resultCode === ResultCode.Success) {
+        localStorage.setItem(AUTH_TOKEN, res.data.data.token)
+        dispatch(setIsLoggedIn({ isLoggedIn: true }))
+      }
+      reset()
+    })
   }
-
-  // console.log(errors)
 
   return (
     <Grid container justifyContent={'center'}>

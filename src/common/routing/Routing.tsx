@@ -3,7 +3,7 @@ import { Login } from "@/features/auth/ui/Login/Login"
 import { Route, Routes } from "react-router"
 import { PageNotFound, ProtectedRoute } from "../components"
 import { useAppSelector } from "../hooks"
-import { selectIsLoggedIn } from "@/features/auth/model/auth-slice"
+import { selectIsLoggedIn } from "@/app/app-slice"
 
 export const PATH = {
   MAIN: "/",
