@@ -18,4 +18,4 @@ export const loginSchema = z.object({
   captcha: z.string().optional(), // optional() означает не обязательное поле
 })
 
-export type Inputs = z.infer<typeof loginSchema>
+export type LoginArgs = z.infer<typeof loginSchema>
