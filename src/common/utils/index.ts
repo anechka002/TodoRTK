@@ -1,6 +1,5 @@
 export { createAppSlice } from './createAppSlice'
-export { handleServerNetworkError } from './handleServerNetworkError'
-export { handleServerAppError } from './handleServerAppError'
 export { createTaskModal } from './createTaskModel'
 export { isErrorWithMessage } from './isErrorWithMessage'
 export { handleError } from './handleError'
+export { baseQueryWithZodValidation } from './baseQueryWithZodValidation'
