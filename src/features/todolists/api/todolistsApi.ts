@@ -1,5 +1,5 @@
-import { DomainTodolist, Todolist } from "./todolistsApi.types"
-import { BaseResponse } from "@/common/types"
+import { DefaultResponse, defaultResponseSchema } from "@/common/types";
+import { CreateTodolistResponse, createTodolistResponseSchema, DomainTodolist, Todolist, todolistSchema } from "./todolistsApi.types"
 import { baseApi } from "@/app/baseApi"
 
 export const todolistsApi = baseApi.injectEndpoints({
@@ -8,29 +8,33 @@ export const todolistsApi = baseApi.injectEndpoints({
       query: () => 'todo-lists',
       transformResponse: (todolists: Todolist[]): DomainTodolist[] => 
         todolists.map(todo => ({...todo, filter: 'all', entityStatus: 'idle'})),
+      extraOptions: { dataSchema:  todolistSchema.array()}, // ZOD
       providesTags: ['Todolist']
     }),
-    addTodolist: builder.mutation<BaseResponse<{ item: Todolist }>, { title: string }>({
+    addTodolist: builder.mutation<CreateTodolistResponse, { title: string }>({
       query: ({title}) => ({
         url: '/todo-lists',
         method: 'POST',
         body: {title}
       }),
+      extraOptions: { dataSchema:  createTodolistResponseSchema}, // ZOD
       invalidatesTags: ['Todolist'],
     }),
-    deleteTodolist: builder.mutation<BaseResponse, { id: string }>({
+    deleteTodolist: builder.mutation<DefaultResponse, { id: string }>({
       query: ({id}) => ({
         url: `/todo-lists/${id}`,
         method: 'DELETE',
       }),
+      extraOptions: { dataSchema:  defaultResponseSchema}, // ZOD
       invalidatesTags: ['Todolist'],
     }),
-    updateTodolistTitle: builder.mutation<BaseResponse, { id: string; title: string }>({
+    updateTodolistTitle: builder.mutation<DefaultResponse, { id: string; title: string }>({
       query: ({id, title}) => ({
         url: `/todo-lists/${id}`,
         method: 'PUT',
         body: {title}
       }),
+      extraOptions: { dataSchema:  defaultResponseSchema}, // ZOD
       invalidatesTags: ['Todolist'],
     }),
   })

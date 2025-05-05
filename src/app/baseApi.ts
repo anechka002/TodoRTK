@@ -1,12 +1,12 @@
 import { AUTH_TOKEN } from "@/common/constants.ts"
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import { handleError } from "@/common/utils"
+import { baseQueryWithZodValidation, handleError } from "@/common/utils"
 
 export const baseApi = createApi({
   reducerPath: "baseApi",
   tagTypes: ["Todolist", "Task"],
-  baseQuery: async (args, api, extraOptions) => {
-
+  baseQuery: baseQueryWithZodValidation(async (args, api, extraOptions) => {
+    // debugger
     // await new Promise(resolve => setTimeout(resolve, 5000))
 
     const result = await fetchBaseQuery({
@@ -17,9 +17,11 @@ export const baseApi = createApi({
       },
     })(args, api, extraOptions)
 
+    // debugger
+
     handleError(api, result)
     
     return result
-  },
+  }),
   endpoints: () => ({}),
 })
