@@ -15,6 +15,8 @@ export const handleError = (
 
   let error = 'Some error occurred'
 
+  // debugger
+
   // 1. Global query errors
   if (result.error) {
     switch (result.error.status) {
