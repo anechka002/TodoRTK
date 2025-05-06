@@ -6,8 +6,7 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   tagTypes: ["Todolist", "Task"],
   baseQuery: baseQueryWithZodValidation(async (args, api, extraOptions) => {
-    // debugger
-    // await new Promise(resolve => setTimeout(resolve, 5000))
+    // await new Promise(resolve => setTimeout(resolve, 3000))
 
     const result = await fetchBaseQuery({
       baseUrl: import.meta.env.VITE_BASE_URL,
@@ -17,11 +16,15 @@ export const baseApi = createApi({
       },
     })(args, api, extraOptions)
 
-    // debugger
-
     handleError(api, result)
     
     return result
   }),
   endpoints: () => ({}),
+  //keepUnusedDataFor: 5 // Время хранения данных в кэше по умолчанию 60 секунд,
+
+  //refetchOnFocus: true, // для автоматического повторного запроса за данными, когда окно приложения или вкладка браузера возвращаются в фокус.
+
+  refetchOnReconnect: true, // для автоматического повторного запроса за данными, когда приложение или браузер восстанавливает соединение с интернетом после его потери.
+
 })
