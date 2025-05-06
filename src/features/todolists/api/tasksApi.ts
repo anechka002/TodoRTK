@@ -13,8 +13,9 @@ export const tasksApi = baseApi.injectEndpoints({
         }
       },
       extraOptions: { dataSchema: getTasksSchema }, // ZOD
-      providesTags: ['Task']
+      providesTags: (_result, _error, {todolistId}) => [{type: 'Task', id: todolistId}],
     }),
+
     createTask: builder.mutation<TaskOperationResponse, { todolistId: string; title: string }>({
       query: ({todolistId, title}) => ({
         url: `todo-lists/${todolistId}/tasks`,
@@ -22,16 +23,18 @@ export const tasksApi = baseApi.injectEndpoints({
         body: {title}
       }),
       extraOptions: { dataSchema: taskOperationResponseSchema },
-      invalidatesTags: ['Task'],
+      invalidatesTags: (_result, _error, {todolistId}) => [{type: 'Task', id: todolistId}]
     }),
+
     deleteTask: builder.mutation<DefaultResponse, { todolistId: string; taskId: string }>({
       query: ({todolistId, taskId}) => ({
         url: `/todo-lists/${todolistId}/tasks/${taskId}`,
         method: 'DELETE',
       }),
       extraOptions: { dataSchema: defaultResponseSchema },
-      invalidatesTags: ['Task'],
+      invalidatesTags: (_result, _error, {todolistId}) => [{ type: 'Task', id: todolistId }],
     }),
+
     updateTask: builder.mutation<TaskOperationResponse, { todolistId: string; taskId: string; model: UpdateTaskModel }>({
       query: ({todolistId, taskId, model}) => ({
         url: `/todo-lists/${todolistId}/tasks/${taskId}`,
@@ -39,7 +42,7 @@ export const tasksApi = baseApi.injectEndpoints({
         body: model
       }),
       extraOptions: { dataSchema: taskOperationResponseSchema }, 
-      invalidatesTags: ['Task'],
+      invalidatesTags: (_result, _error, {todolistId}) => [{ type: 'Task', id: todolistId }],
     }),
     
   })
