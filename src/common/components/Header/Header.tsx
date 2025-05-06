@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography"
 import MenuIcon from "@mui/icons-material/Menu"
 import { useAppSelector } from "@/common/hooks/useAppSelector"
 import { useAppDispatch } from "@/common/hooks/useAppDispatch"
-import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedIn } from "@/app/app-slice"
+import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectTasksLoading, selectThemeMode, setIsLoggedIn } from "@/app/app-slice"
 import { getTheme } from "@/common/theme/theme"
 import { NavButton } from "../NavButton/NavButton"
 import LinearProgress from "@mui/material/LinearProgress"
@@ -18,8 +18,9 @@ import { baseApi } from "@/app/baseApi"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
-  const status =useAppSelector(selectStatus)
+  const status = useAppSelector(selectStatus)
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
+  const tasksLoading = useAppSelector(selectTasksLoading)
 
   const dispatch = useAppDispatch()
 
@@ -33,14 +34,15 @@ export const Header = () => {
   }
 
   const logoutHandler = () => {
-    logout().then((res) => {
-      if (res.data?.resultCode === ResultCode.Success) {
-        localStorage.removeItem(AUTH_TOKEN)
-        dispatch(setIsLoggedIn({ isLoggedIn: false }))
-      }
-    })
+    logout()
+      .then((res) => {
+        if (res.data?.resultCode === ResultCode.Success) {
+          localStorage.removeItem(AUTH_TOKEN)
+          dispatch(setIsLoggedIn({ isLoggedIn: false }))
+        }
+      })
       .then(() => {
-        dispatch(baseApi.util.invalidateTags(['Todolist', 'Task']))
+        dispatch(baseApi.util.invalidateTags(["Todolist", "Task"]))
       })
   }
 
@@ -68,7 +70,7 @@ export const Header = () => {
           </div>
         </Container>
       </Toolbar>
-      {status === "loading" && <LinearProgress />}
+      {(status === "loading" || tasksLoading) && <LinearProgress />}
     </AppBar>
   )
 }

@@ -1,11 +1,15 @@
 import { DefaultResponse, defaultResponseSchema } from "@/common/types";
 import { GetTasksResponse, GetTasksResponseType, getTasksSchema, TaskOperationResponse, taskOperationResponseSchema, UpdateTaskModel } from "./tasksApi.types"
 import { baseApi } from "@/app/baseApi"
+import { PAGE_SIZE } from "@/common/constants.ts";
 
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getTasks: builder.query<GetTasksResponseType, {todolistId: string}>({
-      query: ({todolistId}) => `/todo-lists/${todolistId}/tasks`,
+    getTasks: builder.query<GetTasksResponseType, {todolistId: string, params: { page: number}}>({
+      query: ({todolistId, params}) => ({
+        url: `/todo-lists/${todolistId}/tasks`,
+        params: {...params, count: PAGE_SIZE}
+      }),
       transformResponse (tasks: GetTasksResponse): GetTasksResponseType{
         return {
           ...tasks,
