@@ -6,18 +6,18 @@ import { createSlice, isFulfilled, isPending, isRejected } from "@reduxjs/toolki
 export const appSlice = createSlice({
   name: "app",
   initialState: {
-    themeMode: "light" as ThemeMode,
+    themeMode: "dark" as ThemeMode,
     status: "idle" as RequestStatus,
     error: null as string | null,
     isLoggedIn: false,
-    tasksLoading: false,
+    isTodolistCreated: false,
   },
   selectors: {
     selectThemeMode: (state) => state.themeMode,
     selectStatus: (state) => state.status,
     selectError: (state) => state.error,
     selectIsLoggedIn: (state) => state.isLoggedIn,
-    selectTasksLoading: (state) => state.tasksLoading,
+    selectIsTodolistCreated: (state) => state.isTodolistCreated,
   },
   reducers: (create) => ({
     changeThemeModeAC: create.reducer<{ themeMode: ThemeMode }>((state, action) => {
@@ -32,16 +32,15 @@ export const appSlice = createSlice({
     setIsLoggedIn: create.reducer<{ isLoggedIn: boolean }>((state, action) => {
       state.isLoggedIn = action.payload.isLoggedIn
     }),
-    setTasksLoading: create.reducer<boolean>((state, action) => {
-      state.tasksLoading = action.payload
+    setIsTodolistCreated: create.reducer<boolean>((state, action) => {
+      state.isTodolistCreated = action.payload
     })
   }),
   extraReducers: (builder) => {
     builder
       .addMatcher(isPending, (state, action) => {
         if (
-          todolistsApi.endpoints.getTodolists.matchPending(action) ||
-          // Убираем проверку на tasksApi.endpoints.getTasks.matchPending
+          todolistsApi.endpoints.getTodolists.matchPending(action) || 
           tasksApi.endpoints.getTasks.matchPending(action)
         ) {
           return
@@ -58,7 +57,7 @@ export const appSlice = createSlice({
 })
 export const appReducer = appSlice.reducer
 
-export const { changeThemeModeAC, setAppStatus, setAppError, setIsLoggedIn, setTasksLoading } = appSlice.actions
+export const { changeThemeModeAC, setAppStatus, setAppError, setIsLoggedIn, setIsTodolistCreated } = appSlice.actions
 
-export const { selectThemeMode, selectStatus, selectError, selectIsLoggedIn, selectTasksLoading } = appSlice.selectors
+export const { selectThemeMode, selectStatus, selectError, selectIsLoggedIn, selectIsTodolistCreated } = appSlice.selectors
 

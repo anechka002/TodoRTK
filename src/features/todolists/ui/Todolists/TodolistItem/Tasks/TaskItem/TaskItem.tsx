@@ -16,9 +16,12 @@ type Props = {
   todolistId: string
   entityStatus: RequestStatus
   disabled: boolean
+  setPage: (page: number) => void
+  tasksCount: number
+  page: number
 }
 
-export const TaskItem = ({ task, todolistId, entityStatus, disabled }: Props) => {
+export const TaskItem = ({ task, todolistId, entityStatus, disabled, setPage, tasksCount, page }: Props) => {
 
   const [deleteTask] = useDeleteTaskMutation()
   const [updateTask] = useUpdateTaskMutation()
@@ -26,7 +29,7 @@ export const TaskItem = ({ task, todolistId, entityStatus, disabled }: Props) =>
   const dispatch = useAppDispatch()
 
   const changeTaskStatus = (status: RequestStatus) => {
-    dispatch(tasksApi.util.updateQueryData('getTasks', {todolistId}, (data) => {
+    dispatch(tasksApi.util.updateQueryData('getTasks', {todolistId, params: { page: 1 }}, (data) => {
       const taskToUpdate = data.items.find((el) => el.id === task.id)
       if(taskToUpdate) {
         taskToUpdate.entityStatus = status
@@ -38,9 +41,15 @@ export const TaskItem = ({ task, todolistId, entityStatus, disabled }: Props) =>
     changeTaskStatus('loading')
     deleteTask({ todolistId, taskId: task.id })
       .unwrap()
+      .then(() =>{
+        // после удаления последней задачи на странице, переключаемся на последнюю валидную страницу
+        if (tasksCount === 1 ) {
+          setPage(page > 1 ? page - 1 : 1)
+        }
+      })
       .catch(() => {
         changeTaskStatus('idle')
-      })
+    })
   }
 
   const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {

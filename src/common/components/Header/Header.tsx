@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography"
 import MenuIcon from "@mui/icons-material/Menu"
 import { useAppSelector } from "@/common/hooks/useAppSelector"
 import { useAppDispatch } from "@/common/hooks/useAppDispatch"
-import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectTasksLoading, selectThemeMode, setIsLoggedIn } from "@/app/app-slice"
+import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedIn } from "@/app/app-slice"
 import { getTheme } from "@/common/theme/theme"
 import { NavButton } from "../NavButton/NavButton"
 import LinearProgress from "@mui/material/LinearProgress"
@@ -20,7 +20,6 @@ export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
   const status = useAppSelector(selectStatus)
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
-  const tasksLoading = useAppSelector(selectTasksLoading)
 
   const dispatch = useAppDispatch()
 
@@ -70,7 +69,7 @@ export const Header = () => {
           </div>
         </Container>
       </Toolbar>
-      {(status === "loading" || tasksLoading) && <LinearProgress />}
+      {( status === "loading" ) && <LinearProgress />}
     </AppBar>
   )
 }
