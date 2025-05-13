@@ -1,4 +1,4 @@
-import { baseResponseSchema, Filter, RequestStatus } from "@/common/types"
+import { baseResponseSchema, Filter } from "@/common/types"
 import { z } from "zod"
 
 // export type Todolist = {
@@ -27,5 +27,4 @@ export type CreateTodolistResponse = z.infer<typeof createTodolistResponseSchema
 
 export type DomainTodolist = Todolist & {
   filter: Filter
-  entityStatus: RequestStatus
 }

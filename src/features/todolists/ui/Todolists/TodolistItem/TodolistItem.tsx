@@ -7,9 +7,8 @@ import { useCreateTaskMutation, useGetTasksQuery } from "@/features/todolists/ap
 import { PAGE_SIZE } from "@/common/constants.ts"
 import { TasksPagination } from "./Tasks/TasksPagination/TasksPagination"
 import { useEffect, useState } from "react"
-import { useAppDispatch, useAppSelector } from "@/common/hooks"
-import { selectIsTodolistCreated, setAppStatus } from "@/app/app-slice"
-import { TasksSkeleton } from "./Tasks/TasksSkeleton/TasksSkeleton"
+import { useAppDispatch } from "@/common/hooks"
+import { setAppStatus } from "@/app/app-slice"
 
 type Props = {
   todolist: DomainTodolist
@@ -20,8 +19,6 @@ export const TodolistItem = ({ todolist }: Props) => {
   const [page, setPage] = useState(1)
 
   const dispatch = useAppDispatch()
-
-  const isTodolistCreated = useAppSelector(selectIsTodolistCreated)
 
   const [createTask] = useCreateTaskMutation()
 
@@ -45,18 +42,15 @@ export const TodolistItem = ({ todolist }: Props) => {
     createTask({ todolistId: todolist.id, title })
     setPage(1)
   }
-  
-  if (isLoading && !isTodolistCreated ) {
-    return <TasksSkeleton />
-  }
 
   return (
     <div>
+
       <TodolistTitle todolist={todolist} />
 
-      <CreateItemForm disabled={todolist.entityStatus === 'loading'} onCreateItem={createTaskHandler} />
+      <CreateItemForm onCreateItem={createTaskHandler} />
 
-      <Tasks page={page} setPage={setPage} tasks={tasks} todolist={todolist} />
+      <Tasks isLoading={isLoading} page={page} setPage={setPage} tasks={tasks} todolist={todolist} />
 
       {tasks && tasks?.totalCount > PAGE_SIZE && (
         <TasksPagination page={page} setPage={setPage} totalCount={tasks.totalCount} />

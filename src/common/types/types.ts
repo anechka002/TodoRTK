@@ -3,11 +3,7 @@ import { z } from "zod"
 import { ResultCode } from "../enum/enum"
 
 export type TasksState = {
-  [key: string]: TasksDomainType[]
-}
-
-export type TasksDomainType = DomainTask & {
-  entityStatus: RequestStatus
+  [key: string]: DomainTask[]
 }
 
 export type TodolistType = {

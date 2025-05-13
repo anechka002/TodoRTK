@@ -7,7 +7,7 @@ export const todolistsApi = baseApi.injectEndpoints({
     getTodolists: builder.query<DomainTodolist[], void>({
       query: () => 'todo-lists',
       transformResponse: (todolists: Todolist[]): DomainTodolist[] => 
-        todolists.map(todo => ({...todo, filter: 'all', entityStatus: 'idle'})),
+        todolists.map(todo => ({...todo, filter: 'all'})),
       extraOptions: { dataSchema:  todolistSchema.array()}, // ZOD
       providesTags: ['Todolist']
     }),
@@ -21,10 +21,32 @@ export const todolistsApi = baseApi.injectEndpoints({
       invalidatesTags: ['Todolist'],
     }),
     deleteTodolist: builder.mutation<DefaultResponse, { id: string }>({
-      query: ({id}) => ({
+      query: ({id}) => {
+        // 4
+        return { 
         url: `/todo-lists/${id}`,
         method: 'DELETE',
-      }),
+        }
+      },    
+      async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
+        // 1
+        const patchResult = dispatch(
+          todolistsApi.util.updateQueryData('getTodolists', undefined, state => {
+            // 2
+            const index = state.findIndex(todolist => todolist.id === id)
+            if (index !== -1) {
+              state.splice(index, 1)
+            }
+          })
+        )
+        try {
+          // 3
+          await queryFulfilled
+        } catch {
+          // 5
+          patchResult.undo()
+        }
+      },
       extraOptions: { dataSchema:  defaultResponseSchema}, // ZOD
       invalidatesTags: ['Todolist'],
     }),
@@ -34,6 +56,21 @@ export const todolistsApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: {title}
       }),
+      async onQueryStarted({ id, title }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          todolistsApi.util.updateQueryData('getTodolists', undefined, state => {
+            const index = state.findIndex(todolist => todolist.id === id)
+            if (index !== -1) {
+              state[index].title = title
+            }
+          })
+        )
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.undo()
+        }
+      },
       extraOptions: { dataSchema:  defaultResponseSchema}, // ZOD
       invalidatesTags: ['Todolist'],
     }),

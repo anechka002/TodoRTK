@@ -1,5 +1,4 @@
 import { TaskPriority, TaskStatus } from "@/common/enum"
-import { TasksDomainType } from "@/common/types"
 import { z } from "zod"
 import { baseResponseSchema } from '@/common/types';
 
@@ -40,7 +39,7 @@ export const getTasksSchema = z.object({
 export type GetTasksResponse = z.infer<typeof getTasksSchema>
 
 export type GetTasksResponseType = {
-  items: TasksDomainType[]
+  items: DomainTask[]
   totalCount: number
   error: string | null
 }

@@ -10,7 +10,7 @@ type Props = {
 }
 
 export const FilterButtons = ({ todolist }: Props) => {
-  const { id, filter, entityStatus } = todolist
+  const { id, filter } = todolist
 
   const dispatch = useAppDispatch()
 
@@ -31,7 +31,6 @@ export const FilterButtons = ({ todolist }: Props) => {
         variant={filter === "all" ? "contained" : "outlined"}
         color={"secondary"}
         onClick={() => changeFilter("all")}
-        disabled={entityStatus === "loading"}
       >
         All
       </Button>
@@ -39,7 +38,6 @@ export const FilterButtons = ({ todolist }: Props) => {
         variant={filter === "active" ? "contained" : "outlined"}
         color={"secondary"}
         onClick={() => changeFilter("active")}
-        disabled={entityStatus === "loading"}
       >
         Active
       </Button>
@@ -47,7 +45,6 @@ export const FilterButtons = ({ todolist }: Props) => {
         variant={filter === "completed" ? "contained" : "outlined"}
         color={"secondary"}
         onClick={() => changeFilter("completed")}
-        disabled={entityStatus === "loading"}
       >
         Completed
       </Button>
