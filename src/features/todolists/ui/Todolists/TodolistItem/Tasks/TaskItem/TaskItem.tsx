@@ -5,50 +5,31 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import { ChangeEvent } from "react"
 import { EditableSpan } from "@/common/components"
 import { TaskStatus } from "@/common/enum"
-import { RequestStatus } from "@/common/types"
-import { tasksApi, useDeleteTaskMutation, useUpdateTaskMutation } from "@/features/todolists/api/tasksApi"
+import { useDeleteTaskMutation, useUpdateTaskMutation } from "@/features/todolists/api/tasksApi"
 import { createTaskModal } from "@/common/utils/createTaskModel"
 import { DomainTask } from "@/features/todolists/api/tasksApi.types"
-import { useAppDispatch } from "@/common/hooks"
 
 type Props = {
   task: DomainTask
   todolistId: string
-  entityStatus: RequestStatus
-  disabled: boolean
   setPage: (page: number) => void
   tasksCount: number
   page: number
 }
 
-export const TaskItem = ({ task, todolistId, entityStatus, disabled, setPage, tasksCount, page }: Props) => {
+export const TaskItem = ({ task, todolistId, setPage, tasksCount, page }: Props) => {
 
   const [deleteTask] = useDeleteTaskMutation()
   const [updateTask] = useUpdateTaskMutation()
 
-  const dispatch = useAppDispatch()
-
-  const changeTaskStatus = (status: RequestStatus) => {
-    dispatch(tasksApi.util.updateQueryData('getTasks', {todolistId, params: { page: 1 }}, (data) => {
-      const taskToUpdate = data.items.find((el) => el.id === task.id)
-      if(taskToUpdate) {
-        taskToUpdate.entityStatus = status
-      }
-    }))
-  }
-
   const removeTask = () => {
-    changeTaskStatus('loading')
     deleteTask({ todolistId, taskId: task.id })
-      .unwrap()
-      .then(() =>{
+    .unwrap()
+    .then(() => {
         // после удаления последней задачи на странице, переключаемся на последнюю валидную страницу
-        if (tasksCount === 1 ) {
-          setPage(page > 1 ? page - 1 : 1)
-        }
-      })
-      .catch(() => {
-        changeTaskStatus('idle')
+      if (tasksCount === 1 ) {
+        setPage(page > 1 ? page - 1 : 1)
+      }
     })
   }
 
@@ -65,8 +46,6 @@ export const TaskItem = ({ task, todolistId, entityStatus, disabled, setPage, ta
 
   const isTaskCompleted = task.status === TaskStatus.Completed
 
-  const disabledEntityStatus = entityStatus === "loading" || disabled
-
   return (
     <ListItem
       sx={{
@@ -76,12 +55,12 @@ export const TaskItem = ({ task, todolistId, entityStatus, disabled, setPage, ta
       }}
     >
       <div>
-        <Checkbox disabled={disabledEntityStatus} checked={isTaskCompleted} onChange={changeTaskStatusHandler} color={"secondary"} />
-        <EditableSpan disabled={disabledEntityStatus} onChange={changeTaskTitleHandler} value={task.title} />
+        <Checkbox checked={isTaskCompleted} onChange={changeTaskStatusHandler} color={"secondary"} />
+        <EditableSpan onChange={changeTaskTitleHandler} value={task.title} />
       </div>
       <span>{new Date(task.addedDate).toLocaleDateString()}</span>
       {/* <Button onClick={removeTaskHandler}>x</Button> */}
-      <IconButton disabled={disabledEntityStatus} onClick={removeTask} color="secondary">
+      <IconButton onClick={removeTask} color="secondary">
         <DeleteIcon />
       </IconButton>
     </ListItem>
