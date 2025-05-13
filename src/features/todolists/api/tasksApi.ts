@@ -1,5 +1,5 @@
 import { DefaultResponse, defaultResponseSchema } from "@/common/types";
-import { GetTasksResponse, GetTasksResponseType, getTasksSchema, TaskOperationResponse, taskOperationResponseSchema, UpdateTaskModel } from "./tasksApi.types"
+import { GetTasksResponseType, getTasksSchema, TaskOperationResponse, taskOperationResponseSchema, UpdateTaskModel } from "./tasksApi.types"
 import { baseApi } from "@/app/baseApi"
 import { PAGE_SIZE } from "@/common/constants.ts";
 
@@ -10,12 +10,6 @@ export const tasksApi = baseApi.injectEndpoints({
         url: `/todo-lists/${todolistId}/tasks`,
         params: {...params, count: PAGE_SIZE}
       }),
-      transformResponse (tasks: GetTasksResponse): GetTasksResponseType{
-        return {
-          ...tasks,
-          items: tasks.items.map(el => ({...el, entityStatus: 'idle'}))
-        }
-      },
       extraOptions: { dataSchema: getTasksSchema }, // ZOD
       providesTags: (_result, _error, {todolistId}) => [{type: 'Task', id: todolistId}],
     }),
@@ -35,6 +29,30 @@ export const tasksApi = baseApi.injectEndpoints({
         url: `/todo-lists/${todolistId}/tasks/${taskId}`,
         method: 'DELETE',
       }),
+      async onQueryStarted({ todolistId, taskId }, { dispatch, queryFulfilled, getState }) {
+        const args = tasksApi.util.selectCachedArgsForQuery(getState(), 'getTasks');
+
+        let patchResult: any[] = [];
+        args.forEach(({params}) => {
+          patchResult.push(
+            dispatch(
+              tasksApi.util.updateQueryData('getTasks', {todolistId, params: { page: params.page }}, state => {
+                const index = state.items.findIndex(task => task.id === taskId)
+                if (index !== -1) {
+                  state.items.splice(index, 1);
+                }
+              })
+            )
+          )
+        })
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.forEach((el) => {
+            el.undo()
+          })
+        }
+      },
       extraOptions: { dataSchema: defaultResponseSchema },
       invalidatesTags: (_result, _error, {todolistId}) => [{ type: 'Task', id: todolistId }],
     }),
@@ -45,6 +63,30 @@ export const tasksApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: model
       }),
+      async onQueryStarted({ todolistId, taskId, model }, { dispatch, queryFulfilled, getState }) {
+        const args = tasksApi.util.selectCachedArgsForQuery(getState(), 'getTasks');
+
+        let patchResult: any[] = [];
+        args.forEach(({params}) => {
+          patchResult.push(
+            dispatch(
+              tasksApi.util.updateQueryData('getTasks', {todolistId, params: { page: params.page }}, state => {
+                const index = state.items.findIndex(task => task.id === taskId)
+                if (index !== -1) {
+                  state.items[index] = { ...state.items[index], ...model }
+                }
+              })
+            )
+          )
+        })
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.forEach((el) => {
+            el.undo()
+          })
+        }
+      },
       extraOptions: { dataSchema: taskOperationResponseSchema }, 
       invalidatesTags: (_result, _error, {todolistId}) => [{ type: 'Task', id: todolistId }],
     }),

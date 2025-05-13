@@ -5,7 +5,6 @@ import { Todolists } from "@/features/todolists/ui/Todolists/Todolists"
 import { useAddTodolistMutation } from "@/features/todolists/api/todolistsApi"
 import { useAppDispatch } from "@/common/hooks"
 import { setIsTodolistCreated } from "./app-slice"
-
 export const Main = () => {
 
   const [addTodolist] = useAddTodolistMutation()
@@ -13,10 +12,13 @@ export const Main = () => {
   const dispatch = useAppDispatch()
 
   const addTodolistHandler = async (title: string) => {
-    const result = await addTodolist({title})
-    if(result.data) {
-      dispatch(setIsTodolistCreated(true))
-    }
+    addTodolist({title})
+      .unwrap()
+      .then((result) => {
+        if(result.data) {
+          dispatch(setIsTodolistCreated(true))
+        }
+      })
   }
 
   return (
