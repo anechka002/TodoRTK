@@ -29,6 +29,8 @@ export const baseResponseSchema = <T extends z.ZodTypeAny>(schema: T) =>
     fieldsErrors: fieldErrorSchema.array(),
 })
 
+export type BaseResponse<T> = z.infer<ReturnType<typeof baseResponseSchema<z.ZodType<T>>>>;
+
 export const defaultResponseSchema = baseResponseSchema(z.object({}))
 export type DefaultResponse = z.infer<typeof defaultResponseSchema>
 
