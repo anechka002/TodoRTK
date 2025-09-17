@@ -19,7 +19,7 @@ export const fieldErrorSchema = z.object({
   field: z.string(),
 })
 
-type FieldError = z.infer<typeof fieldErrorSchema>
+// type FieldError = z.infer<typeof fieldErrorSchema>
 
 export const baseResponseSchema = <T extends z.ZodTypeAny>(schema: T) =>
   z.object({
