@@ -15,7 +15,7 @@ export const authApi = baseApi.injectEndpoints({
         body,
       })
     }),
-    logout: builder.mutation<BaseResponse, void>({
+    logout: builder.mutation<BaseResponse<void>, void>({
       query: () => ({
         url: `/auth/login`,
         method: 'DELETE',
@@ -24,4 +24,4 @@ export const authApi = baseApi.injectEndpoints({
   })
 })
 
-export const { useMeQuery, useLoginMutation, useLogoutMutation} = authApi
+export const { useMeQuery, useLoginMutation, useLogoutMutation } = authApi;

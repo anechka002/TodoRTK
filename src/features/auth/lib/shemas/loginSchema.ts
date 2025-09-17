@@ -12,8 +12,8 @@ export const loginSchema = z.object({
   password: z
     .string()
     .min(1, { message: 'Password is required' })
-    .min(3, {message: 'Password must be at least 3 characters long'}),
-    // .regex(passwordRegex, {message: 'Invalid password 😔'}),
+    .min(3, {message: 'Password must be at least 8 characters long'})
+    .regex(passwordRegex, {message: 'Invalid password 😔'}),
   rememberMe: z.boolean().optional(),
   captcha: z.string().optional(), // optional() означает не обязательное поле
 })

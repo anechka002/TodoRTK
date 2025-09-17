@@ -19,7 +19,7 @@ export const fieldErrorSchema = z.object({
   field: z.string(),
 })
 
-type FieldError = z.infer<typeof fieldErrorSchema>
+// type FieldError = z.infer<typeof fieldErrorSchema>
 
 export const baseResponseSchema = <T extends z.ZodTypeAny>(schema: T) =>
   z.object({
@@ -28,6 +28,8 @@ export const baseResponseSchema = <T extends z.ZodTypeAny>(schema: T) =>
     messages: z.string().array(),
     fieldsErrors: fieldErrorSchema.array(),
 })
+
+export type BaseResponse<T> = z.infer<ReturnType<typeof baseResponseSchema<z.ZodType<T>>>>;
 
 export const defaultResponseSchema = baseResponseSchema(z.object({}))
 export type DefaultResponse = z.infer<typeof defaultResponseSchema>
