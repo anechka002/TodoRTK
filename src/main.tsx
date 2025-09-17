@@ -7,7 +7,7 @@ import { BrowserRouter } from "react-router"
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename="/TodoRTK">
       <App />
     </BrowserRouter>
   </Provider>,
