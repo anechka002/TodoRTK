@@ -37,7 +37,7 @@ export const Login = () => {
     control,
     formState: { errors },
   } = useForm<LoginArgs>({
-    defaultValues: { email: "", password: "MasteR!123", rememberMe: false, captcha: "" },
+    defaultValues: { email: "", password: "", rememberMe: false, captcha: "" },
     resolver: zodResolver(loginSchema),
   })
 
