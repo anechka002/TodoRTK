@@ -45,6 +45,7 @@ export const Login = () => {
     const res = await login(data)
 
     if (res.data?.resultCode === ResultCode.CaptchaError) {
+      reset()
       triggerCaptcha()
       return
     }

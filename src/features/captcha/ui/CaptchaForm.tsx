@@ -16,7 +16,7 @@ type Props = {
 export const CaptchaForm = ({url, register, onRefresh, isCaptchaLoading, reset}: Props) => {
 
   const onRefreshHandler = () => {
-    reset({ captcha: "" })
+    reset()
     onRefresh()
   }
 
