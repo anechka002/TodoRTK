@@ -1,6 +1,7 @@
 import { DefaultResponse, defaultResponseSchema } from "@/common/types";
 import { CreateTodolistResponse, createTodolistResponseSchema, DomainTodolist, Todolist, todolistSchema } from "./todolistsApi.types"
 import { baseApi } from "@/app/baseApi"
+import { arrayMove } from "@dnd-kit/sortable"
 
 export const todolistsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -74,8 +75,43 @@ export const todolistsApi = baseApi.injectEndpoints({
       extraOptions: { dataSchema:  defaultResponseSchema}, // ZOD
       invalidatesTags: ['Todolist'],
     }),
+    reorderTodolist: builder.mutation<
+      DefaultResponse,
+      { id: string; putAfterItemId: string | null; oldIndex: number; newIndex: number }
+    >({
+      query: ({ id, putAfterItemId }) => ({
+        url: `/todo-lists/${id}/reorder`,
+        method: 'PUT',
+        body: { putAfterItemId },
+      }),
+      async onQueryStarted({ oldIndex, newIndex }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          todolistsApi.util.updateQueryData('getTodolists', undefined, state => {
+            const reordered = arrayMove(state, oldIndex, newIndex)
+
+            state.splice(0, state.length, ...reordered)
+
+            state.forEach((todolist, index) => {
+              todolist.order = index
+            })
+          })
+        )
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.undo()
+        }
+      },
+      extraOptions: { dataSchema: defaultResponseSchema },
+      invalidatesTags: ['Todolist'],
+    }),
   })
 })
 
-export const { useGetTodolistsQuery, useAddTodolistMutation, useDeleteTodolistMutation, useUpdateTodolistTitleMutation } = todolistsApi
-
+export const {
+  useGetTodolistsQuery,
+  useAddTodolistMutation,
+  useDeleteTodolistMutation,
+  useUpdateTodolistTitleMutation,
+  useReorderTodolistMutation,
+} = todolistsApi
