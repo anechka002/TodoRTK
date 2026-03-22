@@ -103,7 +103,7 @@ export const Login = () => {
                 />
               )}
             />
-            {/* {errors.password && <span className={s.errorMessage}>{errors.password.message}</span>} */}
+             {errors.password && <span className={s.errorMessage}>{errors.password.message}</span>}
 
             <FormControlLabel
               label="Remember me"
