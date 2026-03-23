@@ -18,6 +18,9 @@ import { ResultCode } from "@/common/enum/enum"
 import { AUTH_TOKEN } from "@/common/constants.ts"
 import { CaptchaForm } from "@/features/captcha/ui/CaptchaForm"
 import { useLazyGetCaptchaQuery } from "@/features/captcha/api/captchaApi"
+import { useState } from "react"
+import { IconButton, InputAdornment } from "@mui/material"
+import { Visibility, VisibilityOff } from "@mui/icons-material"
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -29,6 +32,12 @@ export const Login = () => {
   const [login] = useLoginMutation()
 
   const [triggerCaptcha, { data: captchaData, isFetching: isCaptchaLoading }] = useLazyGetCaptchaQuery()
+
+  const [showPassword, setShowPassword] = useState(false)
+
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev)
+  }
 
   const {
     register,
@@ -94,16 +103,32 @@ export const Login = () => {
               control={control}
               render={({ field }) => (
                 <TextField
-                  type="password"
+                  {...field}
+                  type={showPassword ? "text" : "password"}
                   label="Password"
                   margin="normal"
                   error={!!errors.password}
-                  helperText={errors.password?.message} // ошибку передаем в helper text
-                  {...field}
+                  helperText={errors.password?.message}
+                  // ошибку передаем в helper text
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={showPassword ? "hide the password" : "display the password"}
+                            onClick={handleClickShowPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                 />
               )}
             />
-             {errors.password && <span className={s.errorMessage}>{errors.password.message}</span>}
+            {errors.password && <span className={s.errorMessage}>{errors.password.message}</span>}
 
             <FormControlLabel
               label="Remember me"
