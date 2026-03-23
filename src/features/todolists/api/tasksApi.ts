@@ -5,44 +5,44 @@ import { PAGE_SIZE } from "@/common/constants.ts";
 
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getTasks: builder.query<GetTasksResponseType, {todolistId: string, params: { page: number}}>({
-      query: ({todolistId, params}) => ({
+    getTasks: builder.query<GetTasksResponseType, { todolistId: string; params: { page: number } }>({
+      query: ({ todolistId, params }) => ({
         url: `/todo-lists/${todolistId}/tasks`,
-        params: {...params, count: PAGE_SIZE}
+        params: { ...params, count: PAGE_SIZE },
       }),
       extraOptions: { dataSchema: getTasksSchema }, // ZOD
-      providesTags: (_result, _error, {todolistId}) => [{type: 'Task', id: todolistId}],
+      providesTags: (_result, _error, { todolistId }) => [{ type: "Task", id: todolistId }],
     }),
 
     createTask: builder.mutation<TaskOperationResponse, { todolistId: string; title: string }>({
-      query: ({todolistId, title}) => ({
+      query: ({ todolistId, title }) => ({
         url: `todo-lists/${todolistId}/tasks`,
-        method: 'POST',
-        body: {title}
+        method: "POST",
+        body: { title },
       }),
       extraOptions: { dataSchema: taskOperationResponseSchema },
-      invalidatesTags: (_result, _error, {todolistId}) => [{type: 'Task', id: todolistId}]
+      invalidatesTags: (_result, _error, { todolistId }) => [{ type: "Task", id: todolistId }],
     }),
 
     deleteTask: builder.mutation<DefaultResponse, { todolistId: string; taskId: string }>({
-      query: ({todolistId, taskId}) => ({
+      query: ({ todolistId, taskId }) => ({
         url: `/todo-lists/${todolistId}/tasks/${taskId}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
       async onQueryStarted({ todolistId, taskId }, { dispatch, queryFulfilled, getState }) {
-        const args = tasksApi.util.selectCachedArgsForQuery(getState(), 'getTasks');
+        const args = tasksApi.util.selectCachedArgsForQuery(getState(), "getTasks")
 
-        let patchResult: any[] = [];
-        args.forEach(({params}) => {
+        let patchResult: any[] = []
+        args.forEach(({ params }) => {
           patchResult.push(
             dispatch(
-              tasksApi.util.updateQueryData('getTasks', {todolistId, params: { page: params.page }}, state => {
-                const index = state.items.findIndex(task => task.id === taskId)
+              tasksApi.util.updateQueryData("getTasks", { todolistId, params: { page: params.page } }, (state) => {
+                const index = state.items.findIndex((task) => task.id === taskId)
                 if (index !== -1) {
-                  state.items.splice(index, 1);
+                  state.items.splice(index, 1)
                 }
-              })
-            )
+              }),
+            ),
           )
         })
         try {
@@ -54,44 +54,58 @@ export const tasksApi = baseApi.injectEndpoints({
         }
       },
       extraOptions: { dataSchema: defaultResponseSchema },
-      invalidatesTags: (_result, _error, {todolistId}) => [{ type: 'Task', id: todolistId }],
+      invalidatesTags: (_result, _error, { todolistId }) => [{ type: "Task", id: todolistId }],
     }),
 
-    updateTask: builder.mutation<TaskOperationResponse, { todolistId: string; taskId: string; model: UpdateTaskModel }>({
-      query: ({todolistId, taskId, model}) => ({
-        url: `/todo-lists/${todolistId}/tasks/${taskId}`,
-        method: 'PUT',
-        body: model
-      }),
-      async onQueryStarted({ todolistId, taskId, model }, { dispatch, queryFulfilled, getState }) {
-        const args = tasksApi.util.selectCachedArgsForQuery(getState(), 'getTasks');
+    updateTask: builder.mutation<TaskOperationResponse, { todolistId: string; taskId: string; model: UpdateTaskModel }>(
+      {
+        query: ({ todolistId, taskId, model }) => ({
+          url: `/todo-lists/${todolistId}/tasks/${taskId}`,
+          method: "PUT",
+          body: model,
+        }),
+        async onQueryStarted({ todolistId, taskId, model }, { dispatch, queryFulfilled, getState }) {
+          const args = tasksApi.util.selectCachedArgsForQuery(getState(), "getTasks")
 
-        let patchResult: any[] = [];
-        args.forEach(({params}) => {
-          patchResult.push(
-            dispatch(
-              tasksApi.util.updateQueryData('getTasks', {todolistId, params: { page: params.page }}, state => {
-                const index = state.items.findIndex(task => task.id === taskId)
-                if (index !== -1) {
-                  state.items[index] = { ...state.items[index], ...model }
-                }
-              })
+          let patchResult: any[] = []
+          args.forEach(({ params }) => {
+            patchResult.push(
+              dispatch(
+                tasksApi.util.updateQueryData("getTasks", { todolistId, params: { page: params.page } }, (state) => {
+                  const index = state.items.findIndex((task) => task.id === taskId)
+                  if (index !== -1) {
+                    state.items[index] = { ...state.items[index], ...model }
+                  }
+                }),
+              ),
             )
-          )
-        })
-        try {
-          await queryFulfilled
-        } catch {
-          patchResult.forEach((el) => {
-            el.undo()
           })
-        }
+          try {
+            await queryFulfilled
+          } catch {
+            patchResult.forEach((el) => {
+              el.undo()
+            })
+          }
+        },
+        extraOptions: { dataSchema: taskOperationResponseSchema },
+        invalidatesTags: (_result, _error, { todolistId }) => [{ type: "Task", id: todolistId }],
       },
-      extraOptions: { dataSchema: taskOperationResponseSchema }, 
-      invalidatesTags: (_result, _error, {todolistId}) => [{ type: 'Task', id: todolistId }],
+    ),
+
+    reorderTask: builder.mutation<
+      DefaultResponse,
+      { todolistId: string; taskId: string; putAfterItemId: string | null; oldIndex: number; newIndex: number }
+    >({
+      query: ({ todolistId, taskId, putAfterItemId }) => ({
+        url: `/todo-lists/${todolistId}/tasks/${taskId}/reorder`,
+        method: "PUT",
+        body: { putAfterItemId },
+      }),
+      extraOptions: { dataSchema: defaultResponseSchema },
+      invalidatesTags: (_result, _error, { todolistId }) => [{ type: "Task", id: todolistId }],
     }),
-    
-  })
+  }),
 })
 
-export const { useGetTasksQuery, useCreateTaskMutation, useDeleteTaskMutation, useUpdateTaskMutation } = tasksApi
+export const { useGetTasksQuery, useCreateTaskMutation, useDeleteTaskMutation, useUpdateTaskMutation, useReorderTaskMutation } = tasksApi

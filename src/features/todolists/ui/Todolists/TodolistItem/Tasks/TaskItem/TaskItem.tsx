@@ -59,7 +59,6 @@ export const TaskItem = ({ task, todolistId, setPage, tasksCount, page }: Props)
         <EditableSpan onChange={changeTaskTitleHandler} value={task.title} />
       </div>
       <span>{new Date(task.addedDate).toLocaleDateString()}</span>
-      {/* <Button onClick={removeTaskHandler}>x</Button> */}
       <IconButton onClick={removeTask} color="secondary">
         <DeleteIcon />
       </IconButton>
