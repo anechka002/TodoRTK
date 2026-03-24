@@ -1,7 +1,6 @@
 import { DomainTask } from "@/features/todolists/api/tasksApi.types.ts"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import ListItem from "@mui/material/ListItem"
 import IconButton from "@mui/material/IconButton"
 import DragIndicator from "@mui/icons-material/DragIndicator"
 import Box from "@mui/material/Box"
@@ -31,7 +30,11 @@ export const SortableTaskItem = ({
   }
 
   return (
-    <ListItem ref={setNodeRef} style={style} disablePadding sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+    <Box
+      ref={setNodeRef}
+      style={style}
+      sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
+    >
       <IconButton
         {...attributes}
         {...listeners}
@@ -49,6 +52,6 @@ export const SortableTaskItem = ({
       <Box sx={{ flex: 1 }}>
         <TaskItem page={page} tasksCount={tasksCount} setPage={setPage} task={task} todolistId={todolistId} />
       </Box>
-    </ListItem>
+    </Box>
   )
 }

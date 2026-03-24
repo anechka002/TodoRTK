@@ -51,7 +51,7 @@ export const TaskItem = ({ task, todolistId, setPage, tasksCount, page }: Props)
       sx={{
         p: 0,
         justifyContent: "space-between",
-        opacity: task.status ? 0.5 : 1,
+        opacity: isTaskCompleted ? 0.5 : 1,
       }}
     >
       <div>
